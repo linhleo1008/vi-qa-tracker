@@ -3,8 +3,18 @@ window.S = {
   title: ['QA bản dịch Hàn → Việt', '한→베 번역 QA 트래커'],
   all: ['Tất cả', '전체'],
   st_new: ['Mới', '신규'],
-  st_fixed: ['Đã sửa trên admin', '관리자 수정 완료'],
+  st_reported: ['Đã báo lỗi', '개발 요청 완료'],
+  st_waiting: ['Đang chờ xử lý', '처리 대기'],
+  st_fixed: ['Đã sửa', '수정 완료'],
   st_checked: ['Đã kiểm tra trên app', '앱 확인 완료'],
+  f_status: ['Trạng thái', '상태'],
+  f_ticket: ['Mã ticket / link Jira (nếu báo dev)', '티켓 번호 / Jira 링크'],
+  b_selffix: ['Tự sửa trên admin', '관리자에서 직접 수정'],
+  b_report: ['Báo lỗi cho dev', '개발팀에 요청'],
+  b_waiting: ['Dev đang xử lý', '개발 처리 중'],
+  b_devfixed: ['Dev đã sửa', '개발 수정 완료'],
+  by_admin: ['sửa trên admin', '관리자 수정'],
+  by_dev: ['dev sửa · kiểm tra khi có bản build mới', '개발 수정 · 새 빌드에서 확인'],
   due: ['Cần kiểm tra lại', '재확인 필요'],
   add: ['+ Thêm lỗi', '이슈 추가'],
   search: ['Tìm (mã, câu Hàn, câu Việt, ghi chú…)', '검색 (키, 원문, 번역, 메모…)'],
@@ -22,7 +32,6 @@ window.S = {
   edit: ['Sửa', '수정'],
   del: ['Xóa', '삭제'],
   undo: ['Hoàn tác', '되돌리기'],
-  tofixed: ['Đánh dấu đã sửa trên admin', '관리자 수정 완료로'],
   tochecked: ['Đã kiểm tra trên app ✓', '앱 확인 완료 ✓'],
   reopen: ['Mở lại', '다시 열기'],
   recheck: ['Kiểm tra lại trên app lúc', '앱 재확인 시각'],
@@ -48,4 +57,5 @@ window.S = {
   c_unused: ['Không dùng nữa', '미사용'],
   c_other: ['Khác', '기타']
 };
+window.STATUSES = ['new', 'reported', 'waiting', 'fixed', 'checked'];
 window.CATS = ['overflow', 'context', 'order', 'term', 'spell', 'missing', 'unused', 'other'];

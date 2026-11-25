@@ -49,6 +49,10 @@ try { var t = localStorage.getItem('qat:theme'); if (t === 'light' || t === 'dar
       <label><span data-t="f_before"></span><textarea name="before" rows="2" lang="vi"></textarea></label>
       <label><span data-t="f_after"></span><textarea name="after" rows="2" lang="vi"></textarea></label>
     </div>
+    <div class="g3">
+      <label><span data-t="f_status"></span><select name="status" id="status"></select></label>
+      <label class="span2"><span data-t="f_ticket"></span><input name="ticket" placeholder="LS-123 / https://…"></label>
+    </div>
     <label><span data-t="f_note"></span><input name="note"></label>
     <div class="acts">
       <button class="pri" type="submit" data-t="save"></button>

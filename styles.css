@@ -80,7 +80,15 @@ label { display: grid; gap: 4px; font-size: 14px; color: var(--mut); }
 .tag { font-size: 13px; font-weight: 700; color: var(--kot); background: var(--brand2); border-radius: 999px; padding: 3px 10px; }
 .badge { font-size: 13px; font-weight: 700; border-radius: 999px; padding: 3px 10px; }
 .badge.new { color: var(--bad); background: var(--badbg); }
-.badge.fixed { color: var(--warn); background: var(--warnbg); }
+.badge.reported { color: #7c3aed; background: color-mix(in srgb, #7c3aed 14%, transparent); }
+.badge.waiting { color: var(--warn); background: var(--warnbg); }
+.badge.fixed { color: var(--kot); background: var(--brand2); }
+.age { font-size: 14px; color: var(--mut); font-weight: 600; }
+.age.old { color: var(--warn); }
+.by { font-size: 13px; color: var(--mut); }
+.where a { color: var(--kot); }
+.span2 { grid-column: span 2; }
+@media (max-width: 680px) { .span2 { grid-column: auto; } }
 .badge.checked { color: var(--good); background: var(--goodbg); }
 .badge .ko { color: inherit; opacity: .8; }
 .where { font-size: 13px; color: var(--mut); overflow-wrap: anywhere; }
