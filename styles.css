@@ -101,7 +101,7 @@ label { display: grid; gap: 4px; font-size: 14px; color: var(--mut); }
 .pair .a { background: var(--goodbg); font-weight: 600; }
 .pair .arrow { align-self: center; color: var(--mut); padding: 0; }
 .pair .empty { color: var(--mut); font-style: italic; text-decoration: none; font-weight: 400; }
-.note { margin: 0; font-size: 14px; color: var(--mut); }
+.note { margin: 0; font-size: 14px; color: var(--mut); white-space: pre-line; overflow-wrap: anywhere; }
 .recheck { font-size: 14px; font-weight: 600; color: var(--warn); }
 .recheck.now { background: var(--warnbg); border-radius: 8px; padding: 4px 10px; }
 .foot-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }

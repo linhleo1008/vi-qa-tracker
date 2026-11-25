@@ -236,14 +236,21 @@
         // Gộp: lỗi trùng STT thì giữ bản sửa sau cùng
         const byId = new Map(data.items.map(x => [x.id, x]));
         let added = 0, upd = 0;
+        // Nhận ra lỗi đã có theo thời điểm tạo (created), không theo STT
+        const byCreated = new Map(data.items.map(x => [x.created, x]));
+        let next = Math.max(data.nextId, d.nextId || 0, ...data.items.map(x => x.id + 1), ...d.items.map(x => (x && x.id || 0) + 1), 1);
         d.items.forEach(x => {
           if (!x || !x.id) return;
-          const cur = byId.get(x.id);
-          if (!cur) { byId.set(x.id, x); added++; }
-          else if ((x.updated || x.created || 0) > (cur.updated || cur.created || 0)) { byId.set(x.id, x); upd++; }
+          const same = x.created && byCreated.get(x.created);
+          if (same) {                                         // đã có: chỉ cập nhật nếu bản trong file mới hơn
+            if ((x.updated || x.created || 0) > (same.updated || same.created || 0)) { Object.assign(same, x, { id: same.id }); upd++; }
+            return;
+          }
+          if (byId.has(x.id)) x.id = next++;                 // trùng STT với lỗi khác: cấp số mới
+          byId.set(x.id, x); byCreated.set(x.created, x); added++;
         });
         data.items = [...byId.values()];
-        data.nextId = Math.max(data.nextId, d.nextId || 0, ...data.items.map(x => x.id + 1));
+        data.nextId = Math.max(next, ...data.items.map(x => x.id + 1));
         save(); render();
         $('#bmsg').textContent = tp(`Đã nhập: ${added} lỗi mới, ${upd} lỗi cập nhật.`, `가져오기: 신규 ${added}건, 업데이트 ${upd}건`);
       } catch (err) { $('#bmsg').textContent = tp('File không đúng định dạng sao lưu của web này.', '이 웹의 백업 파일이 아닙니다.'); }
