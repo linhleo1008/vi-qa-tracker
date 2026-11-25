@@ -1,7 +1,7 @@
 /* Bảng theo dõi lỗi QA bản dịch Hàn → Việt. Chạy thẳng trong trình duyệt, lưu bằng localStorage. */
 (function () {
   'use strict';
-  const S = window.S, CATS = window.CATS, STATUSES = window.STATUSES;
+  const S = window.S, CATS = window.CATS, STATUSES = window.STATUSES, MARKETS = window.MARKETS;
   const $ = s => document.querySelector(s);
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const KEY = 'qat:data';
@@ -46,7 +46,7 @@
   const todayKey = () => dayKey(Date.now());
 
   /* ---------- Trạng thái lọc ---------- */
-  let fStatus = 'all', fCat = '', q = '', editing = null;
+  let fStatus = 'all', fCat = '', fMk = '', q = '', editing = null;
   // Chỉ lỗi tự sửa trên admin mới có giờ kiểm tra lại (dev sửa thì chờ bản build mới)
   const isDue = x => x.status === 'fixed' && x.fixedBy !== 'dev' && x.fixedAt && Date.now() >= x.fixedAt + RECHECK_MIN * 60000;
   const daysSince = ts => ts ? Math.floor((Date.now() - ts) / 864e5) : 0;
@@ -60,6 +60,9 @@
     $('#fcat').innerHTML = `<option value="">${esc(TP('allcat'))}</option>` + catOpts;
     $('#fcat').value = fCat;
     const cur = $('#cat').value; $('#cat').innerHTML = catOpts; if (cur) $('#cat').value = cur;
+    const mkOpts = MARKETS.map(m => `<option value="${m}">${esc(TP('mk_' + m))}</option>`).join('');
+    $('#fmk').innerHTML = `<option value="">${esc(TP('allmk'))}</option>` + mkOpts; $('#fmk').value = fMk;
+    const cm = $('#market').value; $('#market').innerHTML = mkOpts; if (cm) $('#market').value = cm;
     const cs = $('#status').value; $('#status').innerHTML = STATUSES.map(s => `<option value="${s}">${esc(TP('st_' + s))}</option>`).join(''); if (cs) $('#status').value = cs;
     applyTheme();
   }
@@ -104,6 +107,7 @@
   function matches(x) {
     if (fStatus === 'due' ? !isDue(x) : (fStatus !== 'all' && x.status !== fStatus)) return false;
     if (fCat && x.cat !== fCat) return false;
+    if (fMk && (x.market || 'VN') !== fMk) return false;
     if (q) { const h = [x.key, x.screen, x.ko, x.before, x.after, x.note, x.ticket].join(' ').toLowerCase(); if (!h.includes(q)) return false; }
     return true;
   }
@@ -138,7 +142,7 @@
       : st === 'fixed' ? btn('checked', 'tochecked')
       : btn('reopen', 'reopen', 'step done');
     return `<article class="item st-${st}" data-id="${x.id}">
-      <div class="head"><span class="num">#${x.id}</span><span class="tag">${T('c_' + (x.cat || 'other'))}</span><span class="badge ${st}">${T('st_' + st)}</span>${where ? `<span class="where">${where}</span>` : ''}</div>
+      <div class="head"><span class="num">#${x.id}</span><span class="mk ${esc(x.market || 'VN')}" title="${esc(TP('mk_' + (x.market || 'VN')))}">${esc(x.market || 'VN')}</span><span class="tag">${T('c_' + (x.cat || 'other'))}</span><span class="badge ${st}">${T('st_' + st)}</span>${where ? `<span class="where">${where}</span>` : ''}</div>
       ${x.ko ? `<p class="src" lang="ko"><span>KO</span>${esc(x.ko)}</p>` : ''}
       <div class="pair" lang="vi">
         <div class="b${x.before ? '' : ' empty'}">${x.before ? esc(x.before) : '—'}</div><div class="arrow" aria-hidden="true">→</div>
@@ -167,6 +171,7 @@
     const f = F(); f.reset(); f.hidden = false; $('#fmsg').textContent = '';
     if (x) ['key', 'screen', 'ko', 'before', 'after', 'note', 'ticket'].forEach(k => { f.elements[k].value = x[k] || ''; });
     f.elements.status.value = x ? (x.status || 'new') : 'new';
+    f.elements.market.value = x ? (x.market || 'VN') : (get('qat:lastmk') || 'VN');
     f.elements.cat.value = x ? (x.cat || 'other') : (get('qat:lastcat') || 'overflow');
     if (!x && get('qat:lastscreen')) f.elements.screen.value = get('qat:lastscreen');   // thường QA nhiều lỗi trên cùng 1 màn hình
     $('[data-g=saveadd]').hidden = !!x;
@@ -175,10 +180,10 @@
   }
   function submit(keepOpen) {
     const f = F(), v = k => f.elements[k].value.trim().normalize('NFC');
-    const vals = { key: v('key'), screen: v('screen'), cat: f.elements.cat.value, ko: v('ko'), before: v('before'), after: v('after'), note: v('note'), ticket: v('ticket') };
+    const vals = { key: v('key'), screen: v('screen'), cat: f.elements.cat.value, ko: v('ko'), before: v('before'), after: v('after'), note: v('note'), ticket: v('ticket'), market: f.elements.market.value };
     const newSt = f.elements.status.value;
     if (!vals.ko && !vals.before && !vals.after) { $('#fmsg').textContent = TP('need'); return; }
-    set('qat:lastcat', vals.cat); set('qat:lastscreen', vals.screen);
+    set('qat:lastcat', vals.cat); set('qat:lastscreen', vals.screen); set('qat:lastmk', vals.market);
     let it;
     if (editing) { it = data.items.find(x => x.id === editing); Object.assign(it, vals, { updated: Date.now() }); }
     else { it = Object.assign({ id: data.nextId++, status: 'new', created: Date.now() }, vals); data.items.push(it); }
@@ -221,8 +226,8 @@
   function exportJSON() { if (saveT) flush(); download(`vi-qa-tracker-${stamp()}.json`, JSON.stringify({ app: 'vi-qa-tracker', version: 1, exported: new Date().toISOString(), ...data }, null, 2), 'application/json'); }
   function exportCSV() {
     const cell = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
-    const head = ['STT', 'Mã chuỗi', 'Màn hình', 'Loại lỗi', 'Câu Hàn gốc', 'Bản Việt lỗi', 'Bản Việt sửa', 'Ghi chú', 'Trạng thái', 'Người sửa', 'Ticket', 'Ngày tạo', 'Ngày báo dev'];
-    const rows = [...data.items].sort((a, b) => a.id - b.id).map(x => [x.id, x.key, x.screen, S['c_' + (x.cat || 'other')][0], x.ko, x.before, x.after, x.note, S['st_' + (x.status || 'new')][0], x.fixedBy === 'dev' ? 'Dev' : x.fixedBy === 'admin' ? 'Admin' : '', x.ticket, x.created ? dayKey(x.created) : '', x.reportedAt ? dayKey(x.reportedAt) : '']);
+    const head = ['STT', 'Thị trường', 'Mã chuỗi', 'Màn hình', 'Loại lỗi', 'Câu Hàn gốc', 'Bản Việt lỗi', 'Bản Việt sửa', 'Ghi chú', 'Trạng thái', 'Người sửa', 'Ticket', 'Ngày tạo', 'Ngày báo dev'];
+    const rows = [...data.items].sort((a, b) => a.id - b.id).map(x => [x.id, x.market || 'VN', x.key, x.screen, S['c_' + (x.cat || 'other')][0], x.ko, x.before, x.after, x.note, S['st_' + (x.status || 'new')][0], x.fixedBy === 'dev' ? 'Dev' : x.fixedBy === 'admin' ? 'Admin' : '', x.ticket, x.created ? dayKey(x.created) : '', x.reportedAt ? dayKey(x.reportedAt) : '']);
     // BOM để Excel đọc đúng tiếng Việt / tiếng Hàn
     download(`vi-qa-tracker-${stamp()}.csv`, '﻿' + [head, ...rows].map(r => r.map(cell).join(',')).join('\r\n'), 'text/csv;charset=utf-8');
   }
@@ -236,6 +241,17 @@
         // Gộp: lỗi trùng STT thì giữ bản sửa sau cùng
         const byId = new Map(data.items.map(x => [x.id, x]));
         let added = 0, upd = 0;
+        // File nhập theo lô (batch): gỡ lỗi cũ của lô này mà chị chưa đụng vào và không còn trong file mới
+        let removed = 0;
+        if (d.batch) {
+          const keep = new Set(d.items.map(x => x && x.created));
+          const untouched = x => (x.updated || x.created) === x.created;
+          const oldOfBatch = x => x.batch === d.batch || (!x.batch && /^\[Nguồn:/.test(x.note || ''));
+          const before = data.items.length;
+          data.items = data.items.filter(x => !(oldOfBatch(x) && untouched(x) && !keep.has(x.created)));
+          removed = before - data.items.length;
+          byId.clear(); data.items.forEach(x => byId.set(x.id, x));
+        }
         // Nhận ra lỗi đã có theo thời điểm tạo (created), không theo STT
         const byCreated = new Map(data.items.map(x => [x.created, x]));
         let next = Math.max(data.nextId, d.nextId || 0, ...data.items.map(x => x.id + 1), ...d.items.map(x => (x && x.id || 0) + 1), 1);
@@ -252,7 +268,7 @@
         data.items = [...byId.values()];
         data.nextId = Math.max(next, ...data.items.map(x => x.id + 1));
         save(); render();
-        $('#bmsg').textContent = tp(`Đã nhập: ${added} lỗi mới, ${upd} lỗi cập nhật.`, `가져오기: 신규 ${added}건, 업데이트 ${upd}건`);
+        $('#bmsg').textContent = tp(`Đã nhập: ${added} lỗi mới, ${upd} lỗi cập nhật${removed ? `, gỡ ${removed} lỗi cũ không còn trong file` : ''}.`, `가져오기: 신규 ${added}건, 업데이트 ${upd}건${removed ? `, 이전 항목 ${removed}건 제거` : ''}`);
       } catch (err) { $('#bmsg').textContent = tp('File không đúng định dạng sao lưu của web này.', '이 웹의 백업 파일이 아닙니다.'); }
       e.target.value = '';
     };
@@ -305,6 +321,7 @@
   F().addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); submit(!editing); } });
   $('#q').addEventListener('input', e => { q = e.target.value.trim().toLowerCase().normalize('NFC'); renderList(); });
   $('#fcat').addEventListener('change', e => { fCat = e.target.value; renderList(); });
+  $('#fmk').addEventListener('change', e => { fMk = e.target.value; renderList(); });
   // Mở 2 tab cùng lúc: tab kia lưu thì tab này cập nhật
   window.addEventListener('storage', e => { if (e.key === KEY) { data = load(); render(); } });
   // Cập nhật giờ "kiểm tra lại" mỗi phút

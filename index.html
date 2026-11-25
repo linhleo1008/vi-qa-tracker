@@ -35,6 +35,7 @@ try { var t = localStorage.getItem('qat:theme'); if (t === 'light' || t === 'dar
     <button class="pri" type="button" data-g="add" data-t="add"></button>
     <input id="q" type="search" aria-label="Tìm">
     <select id="fcat" aria-label="Loại lỗi"></select>
+    <select id="fmk" aria-label="Thị trường"></select>
   </div>
 
   <!-- Form thêm / sửa lỗi -->
@@ -43,6 +44,7 @@ try { var t = localStorage.getItem('qat:theme'); if (t === 'light' || t === 'dar
       <label><span data-t="f_key"></span><input name="key" placeholder="match_end_title"></label>
       <label><span data-t="f_screen"></span><input name="screen" list="screens"></label>
       <label><span data-t="f_cat"></span><select name="cat" id="cat"></select></label>
+      <label><span data-t="f_market"></span><select name="market" id="market"></select></label>
     </div>
     <label><span data-t="f_ko"></span><textarea name="ko" rows="2" lang="ko"></textarea></label>
     <div class="g2">

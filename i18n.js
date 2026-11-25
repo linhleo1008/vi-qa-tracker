@@ -7,6 +7,11 @@ window.S = {
   st_waiting: ['Đang chờ xử lý', '처리 대기'],
   st_fixed: ['Đã sửa', '수정 완료'],
   st_checked: ['Đã kiểm tra trên app', '앱 확인 완료'],
+  f_market: ['Thị trường', '마켓'],
+  allmk: ['Mọi thị trường', '모든 마켓'],
+  mk_VN: ['Việt Nam', '베트남'],
+  mk_Global: ['Global (chung)', '글로벌 공통'],
+  mk_KR: ['Hàn Quốc', '한국'],
   f_status: ['Trạng thái', '상태'],
   f_ticket: ['Mã ticket / link Jira (nếu báo dev)', '티켓 번호 / Jira 링크'],
   b_selffix: ['Tự sửa trên admin', '관리자에서 직접 수정'],
@@ -57,5 +62,6 @@ window.S = {
   c_unused: ['Không dùng nữa', '미사용'],
   c_other: ['Khác', '기타']
 };
+window.MARKETS = ['VN', 'Global', 'KR'];
 window.STATUSES = ['new', 'reported', 'waiting', 'fixed', 'checked'];
 window.CATS = ['overflow', 'context', 'order', 'term', 'spell', 'missing', 'unused', 'other'];
