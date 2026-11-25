@@ -1,0 +1,4 @@
+vi-qa-tracker-*.json
+vi-qa-tracker-*.csv
+*.zip
+.DS_Store

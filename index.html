@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QA bản dịch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script>/* Áp sáng/tối đã chọn ngay khi mở, tránh nháy màu */
+try { var t = localStorage.getItem('qat:theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}</script>
+</head>
+<body>
+<header class="top"><div class="in">
+  <h1 data-t="title"></h1>
+  <div class="tools">
+    <div class="lang" role="group" aria-label="Ngôn ngữ / 언어">
+      <button type="button" data-g="lang" data-v="bi">VI + 한</button><button type="button" data-g="lang" data-v="vi">VI</button><button type="button" data-g="lang" data-v="ko">한</button>
+    </div>
+    <button class="themeb" id="btheme" type="button" data-g="theme">◐</button>
+  </div>
+</div></header>
+
+<main class="wrap">
+  <!-- Bộ lọc theo trạng thái, kèm số lượng -->
+  <nav class="tabs" id="tabs" aria-label="Trạng thái"></nav>
+
+  <div class="todayrow">
+    <p id="today"></p>
+    <button class="ghost" type="button" data-g="copysum" data-t="copysum"></button>
+  </div>
+
+  <div class="toolbar">
+    <button class="pri" type="button" data-g="add" data-t="add"></button>
+    <input id="q" type="search" aria-label="Tìm">
+    <select id="fcat" aria-label="Loại lỗi"></select>
+  </div>
+
+  <!-- Form thêm / sửa lỗi -->
+  <form id="form" class="form" hidden>
+    <div class="g3">
+      <label><span data-t="f_key"></span><input name="key" placeholder="match_end_title"></label>
+      <label><span data-t="f_screen"></span><input name="screen" list="screens"></label>
+      <label><span data-t="f_cat"></span><select name="cat" id="cat"></select></label>
+    </div>
+    <label><span data-t="f_ko"></span><textarea name="ko" rows="2" lang="ko"></textarea></label>
+    <div class="g2">
+      <label><span data-t="f_before"></span><textarea name="before" rows="2" lang="vi"></textarea></label>
+      <label><span data-t="f_after"></span><textarea name="after" rows="2" lang="vi"></textarea></label>
+    </div>
+    <label><span data-t="f_note"></span><input name="note"></label>
+    <div class="acts">
+      <button class="pri" type="submit" data-t="save"></button>
+      <button class="ghost" type="button" data-g="saveadd" data-t="saveadd"></button>
+      <button class="ghost" type="button" data-g="cancel" data-t="cancel"></button>
+      <span class="msg" id="fmsg" role="status"></span>
+    </div>
+  </form>
+  <datalist id="screens"></datalist>
+
+  <div id="list" class="list"></div>
+
+  <details class="box">
+    <summary data-t="backup"></summary>
+    <p class="mut" data-t="backuph"></p>
+    <div class="acts">
+      <button class="ghost" type="button" data-g="export" data-t="export"></button>
+      <label class="ghost file"><span data-t="import"></span><input type="file" id="impf" accept=".json,application/json" hidden></label>
+      <button class="ghost" type="button" data-g="csv" data-t="csv"></button>
+      <span class="msg" id="bmsg" role="status"></span>
+    </div>
+  </details>
+  <p class="foot" id="sync" role="status"></p>
+</main>
+
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
